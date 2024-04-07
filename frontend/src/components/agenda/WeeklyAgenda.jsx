@@ -44,7 +44,6 @@ export default function WeeklyAgenda({ rdvGroupByDays, setIsUpdated }) {
   };
 
   const currentDay = moment().format("L");
-
   return (
     <div className="flex flex-col text-2xl font-lexend pb-12 dark:text-sand ">
       <h1 className="text-center pt-2">Semaine {moment().week()}</h1>

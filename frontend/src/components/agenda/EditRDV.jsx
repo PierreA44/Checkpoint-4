@@ -14,7 +14,6 @@ export default function EditRDV({ closeModal, setIsUpdated, editID }) {
   const [selectedContact, setSelectedContact] = useState([]);
   const [userRDV, setUserRDV] = useState();
   const [deleted, setDeleted] = useState(false);
-  const [isMounted, setIsMounted] = useState(true);
   const {
     register,
     handleSubmit,
@@ -22,40 +21,56 @@ export default function EditRDV({ closeModal, setIsUpdated, editID }) {
     formState: { errors },
   } = useForm();
 
-  useEffect(() => {
-    if (isMounted || deleted) {
-      axios
-        .get(`${import.meta.env.VITE_BACKEND_URL}/api/rdv/${editID}`, {
-          headers: {
-            Authorization: `Bearer ${auth}`,
-          },
-        })
-        .then((res) => setUserRDV(res.data));
-      axios
-        .get(`${import.meta.env.VITE_BACKEND_URL}/api/contact`, {
-          headers: {
-            Authorization: `Bearer ${auth}`,
-          },
-        })
-        .then((res) => setUserContacts(res.data));
+  const fetchData = () => {
+    axios
+      .get(`${import.meta.env.VITE_BACKEND_URL}/api/rdv/${editID}`, {
+        headers: {
+          Authorization: `Bearer ${auth}`,
+        },
+      })
+      .then((res) => setUserRDV(res.data));
 
-      setDeleted(false);
-      setIsMounted(false);
-    }
-  }, [isMounted, deleted]);
+    axios
+      .get(`${import.meta.env.VITE_BACKEND_URL}/api/contact`, {
+        headers: {
+          Authorization: `Bearer ${auth}`,
+        },
+      })
+      .then((res) => setUserContacts(res.data));
+  };
 
   const arrayContact = [];
+  const [isArray, setIsArray] = useState();
+  const toto = () => {
+    if (userRDV?.contact_rdv !== null) {
+      const arrayContactName = userRDV.contact_rdv.split(",");
+      const arrayContactID = userRDV.contact_id.split(",");
+      for (let i = 0; i < arrayContactName.length; i += 1) {
+        arrayContact.push({
+          id: Number(arrayContactID[i]),
+          name: arrayContactName[i],
+        });
+      }
+      setIsArray(arrayContact);
+    }
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  // if (userRDV && userRDV?.contact_rdv !== null) {
-  //   const arrayContactName = userRDV.contact_rdv.split(",");
-  //   const arrayContactID = userRDV.contact_id.split(",");
-  //   for (let i = 0; i < arrayContactName.length; i = +1) {
-  //     arrayContact.push({
-  //       id: Number(arrayContactID[i]),
-  //       name: arrayContactName[i],
-  //     });
-  //   }
-  // }
+  useEffect(() => {
+    if (deleted) {
+      fetchData();
+      setDeleted(false);
+    }
+  }, [deleted]);
+
+  useEffect(() => {
+    if (userRDV || deleted) {
+      toto();
+    }
+  }, [userRDV, deleted]);
+
   console.info(arrayContact);
 
   if (watch("contacts") && !selectedContact.includes(watch("contacts"))) {
@@ -104,6 +119,7 @@ export default function EditRDV({ closeModal, setIsUpdated, editID }) {
       toast.error(error.response.data.message);
     }
   };
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -183,7 +199,7 @@ export default function EditRDV({ closeModal, setIsUpdated, editID }) {
       ))}
       {userRDV &&
         userRDV.contact_rdv !== null &&
-        arrayContact.map((e) => (
+        isArray.map((e) => (
           <div className="flex flex-row gap-2 items-center" key={e.id}>
             <input
               type="text"

@@ -63,7 +63,7 @@ export default function AgendaPage() {
   const rdvGroupByDays = Object.groupBy(weeklyRDV, ({ day }) => day);
 
   const monthlyRDV = rdv.filter(
-    (r) => month === moment(r.scheduled_date).format("MMMM")
+    (r) => month === moment(r.start_rdv).format("MMMM")
   );
   const rdvGroupByD = Object.groupBy(monthlyRDV, ({ d }) => d);
 

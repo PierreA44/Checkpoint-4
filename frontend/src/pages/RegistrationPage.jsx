@@ -37,7 +37,7 @@ export default function RegistrationPage() {
         <input
           type="text"
           name="pseudo"
-          className="rounded-md pl-2 dark:bg-slate-200"
+          className="rounded-md pl-2 bg-slate-200"
           {...register("pseudo", {
             required: "Ce champs est obligatoire",
             minLength: {
